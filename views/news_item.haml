@@ -1,0 +1,37 @@
+- if news['del']
+  %article{:class => "deleted"} [deleted news]
+- else
+  - domain = news_domain(news)
+  - news = {}.merge(news) # Copy the object so we can modify it as we wish.
+  - news["url"] = "/news/#{news["id"]}" if !domain
+  - upclass = "uparrow"
+  - downclass = "downarrow"
+  - if news["voted"] == :up
+    - upclass << " voted"
+    - downclass << " disabled"
+  - elsif news["voted"] == :down
+    - downclass << " voted"
+    - upclass << " disabled"
+
+  %article{"data-news-id" => news["id"]}
+    .article-rank{:class => "#{defined?(num) ? '' : 'no-number'}"}
+      %a.uparrow{:href => "#up", :cass => upclass} &#9650;
+      - if defined? num
+        %span.number= num
+      - else
+        %span.number
+      %a.downarrow{:href => "#down", :cass => downclass} &#9660;
+    .article-link-and-info
+      %h2.article-link
+        %a{:href=>news["url"]}= H.entities news["title"]
+      %p.info
+        %span.posted-by
+          - if domain
+            %span.domain
+              = H.entities(domain)
+              %span.sep= "|"
+          %span.posted-by-label== posted by
+          %a.posted-by-user{:href=>"/user/"+H.urlencode(news["username"])}= H.entities news["username"]
+          = str_elapsed(news["ctime"].to_i)
+          %span.sep= "|"
+        %a.comment-count{:href => "/news/#{news["id"]}"}= news["comments"]+" comments"

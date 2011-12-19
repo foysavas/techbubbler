@@ -1,0 +1,30 @@
+.comment-html
+  - indent = "margin-left:#{c['level'].to_i*CommentReplyShift}px"
+  - score = compute_comment_score(c)
+  - news_id = c['thread_id']
+
+  - if c['del'] and c['del'].to_i == 1
+    %article{:style => indent,:class=>"commented deleted"} [comment deleted]
+  - else
+    - show_edit_link = !c['topcomment'] && ($user && ($user['id'].to_i == c['user_id'].to_i)) && (c['ctime'].to_i > (Time.now.to_i - CommentEditTime))
+    - comment_id = "#{news_id}-#{c['id']}"
+    %article{:class => "comment", :style => indent, "data-comment-id" => comment_id, :id => comment_id}
+      .info-and-avatar
+        %span.avatar
+          %img{:src => gravatar_url_for(u['email'],22)}
+        %span.info
+          %span.username
+            %a{:href=>"/user/"+H.urlencode(u["username"])}= H.entities u["username"]
+            - if !c['topcomment']
+              %a{:href=>"/comment/#{news_id}/#{c["id"]}", :class=>"reply"}
+                %span.ctime= str_elapsed(c["ctime"].to_i)+". "
+            - else
+              %span.ctime= str_elapsed(c["ctime"].to_i)+". "
+            - if $user and !c['topcomment']
+              %a{:href=>"/reply/#{news_id}/#{c["id"]}", :class=>"reply"} reply
+            - if !c['topcomment']
+              %a.uparrow{:href => "#up"} &#9650;
+              %a.downarrow{:href => "#down"} &#9660;
+            - if show_edit_link
+              %a{:href=> "/editcomment/#{news_id}/#{c["id"]}", :class =>"reply"}== edit (#{(CommentEditTime - (Time.now.to_i-c['ctime'].to_i))/60} minutes left)
+      .comment-text= urls_to_links H.entities(c["body"].strip)

@@ -1,0 +1,17 @@
+%section#newslist= haml :news_item, :locals => {:news => @news}
+= @top_comment
+- if $user
+  %form.nice{:name=>"f"}
+    %input{:type => :hidden, :name => "news_id", :value => @news["id"]}
+    %input{:type => :hidden, :name => "comment_id", :value => -1}
+    %input{:type => :hidden, :name => "parent_id", :value => -1}
+    %textarea.large{:name => "comment", :cols => 60, :rows => 10}
+    %button.medium.nice.button.radius.white{:name => "post_comment"} Post Comment
+  #errormsg
+
+= render_comments_for_news(@news["id"])
+
+:javascript
+  $(function() {
+    $("button[name=post_comment]").click(post_comment);
+  });

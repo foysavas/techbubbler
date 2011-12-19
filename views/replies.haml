@@ -1,0 +1,6 @@
+- $r.hset("user:#{$user['id']}","replies",0)
+%h2 Your threads
+#comments
+  - @comments.each do |c|
+    = render_comment_subthread(c)
+

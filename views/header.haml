@@ -1,0 +1,20 @@
+.container
+  %a#site-name{:href => "/"}
+    %h1= SiteName
+  %nav#nav
+    %a{:href => "/"} Top
+    %a{:href => "/latest/0"} Latest
+    /%a{:href => "/archive"} Archive
+  %nav#account.hide-on-phones
+    %a{:href => "/submit"} Submit
+    - if $user
+      %a{:href => "/user/#{H.urlencode($user['username'])}"}
+        %img.avatar{:src => gravatar_url_for($user['email'],32)}
+        %span.user== #{$user['username']} (#{$user['karma']})
+      %a{:href => "/logout?apisecret=#{$user['apisecret']}"} logout
+    - else
+      %a{:href => "/signup"} Signup
+      %a{:href => "/login"} Login
+  #header-floats.hide-on-phones
+    #header-float-left
+    #header-float-right

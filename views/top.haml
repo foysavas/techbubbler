@@ -1,0 +1,4 @@
+%h2 Top News
+%section#newslist
+  - @news.each_with_index do |n,i|
+    = haml :news_item, :locals => {:news => n, :num => (i+1)}

@@ -1,0 +1,18 @@
+%rss{:version => "2.0", "xmlns:atom" => "http://www.w3.org/2005/Atom"}
+  %channel
+    %title= "#{SiteName}"
+    %link= "#{request.env['rack.url_scheme']}://#{request.env['HTTP_HOST']}"
+    %description= "Description pending"
+    - @news.each do |news|
+      - domain = news_domain(news)
+      - news = {}.merge(news) # Copy the object so we can modify it as we wish.
+      - news["ln_url"] = "#{request.env['rack.url_scheme']}://#{request.env['HTTP_HOST']}/news/#{news["id"]}"
+      - news["url"] = news["ln_url"] if !domain
+      %item
+        %title= H.entities news["title"]
+        %guid= H.entities news["url"]
+        %link= H.entities news["url"]
+        %description
+          :plain
+            <![CDATA[<a href="#{news["ln_url"]}">Comments</a>]]>
+        %comments= H.entities news["ln_url"]

@@ -1,0 +1,25 @@
+= haml :news_item, :locals => {:news => @news}
+#submitform
+  %form.nice{:name => "f"}
+    %input{:type => :hidden, :name => "news_id", :value => @news['id']}
+    %h2.form-step
+      %span.number 1
+      %span.text What's the headline?
+    %label{:for => "title"} Title
+    %input#title.input-text.large{:type => :text, :name => "title", :size => 80, :value => @news['title']}
+    %h2.form-step
+      %span.number 2
+      %span.text Outbound link or on-site text?
+    %label{:for => "url"} Link Url
+    %input#url.input-text.large{:type => :text, :name => "url", :size => 60, :value => @news['url']}
+    %p.form-or <span class="dash">&mdash;</span> or <span class="dash">&mdash;</span>
+    %label{:for => "text"} Story Text
+    %textarea#text.large{:name => "text", :cols => 60, :rows => 10, :value => @news['text']}
+    %input{:type => :checkbox, :name => "del", :value => "1"} Delete This Story
+    %button.nice.white.radius.medium.button{:name => "edit_news"} Submit
+#errormsg
+:javascript
+  $(function() {
+      $("button[name=edit_news]").click(submit);
+  });
+

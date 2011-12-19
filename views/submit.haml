@@ -1,0 +1,24 @@
+%h2 Submit a New Story
+#submitform
+  %form.nice{:name=>"f"}
+    %input{:type => :hidden, :name => "news_id", :value => -1}
+    %h2.form-step
+      %span.number 1
+      %span.text What's the headline?
+    %label{:for => "title"} Title
+    %input#title.input-text.large{:type => :text, :name => "title", :size => 80, :value => (params[:t] ? H.entities(params[:t]) : "")}
+    %h2.form-step
+      %span.number 2
+      %span.text Outbound link or on-site text?
+    %label{:for => "url"} Link Url
+    %input#url.input-text.large{:type => :text, :name => "url", :size => 60, :value => (params[:u] ? H.entities(params[:u]) : "")}
+    %p.form-or <span class="dash">&mdash;</span> or <span class="dash">&mdash;</span>
+    %label{:for => "text"} Story Text
+    %textarea#text.large{:name => "text", :cols => 60, :rows => 10}
+    %button.nice.white.radius.medium.button{:name => "do_submit"} Submit
+    #errormsg
+
+:javascript
+  $(function() {
+      $("button[name=do_submit]").click(submit);
+  });

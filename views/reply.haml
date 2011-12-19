@@ -1,0 +1,14 @@
+= haml :news_item, :locals => {:news => @news}
+= haml :comment_html, :locals => {:c => @comment, :u => @user}
+%form.nice{:name=>"f"}
+  %input{:type => :hidden, :name => "news_id", :value => @news["id"]}
+  %input{:type => :hidden, :name => "comment_id", :value => -1}
+  %input{:type => :hidden, :name => "parent_id", :value => params["comment_id"]}
+  %textarea.large{:name => "comment", :cols => 60, :rows => 10}
+  %button.medium.nice.button.radius.white{:name => "post_comment"} Reply
+#errormsg
+
+:javascript
+  $(function() {
+      $("button[name=post_comment]").click(post_comment);
+  });

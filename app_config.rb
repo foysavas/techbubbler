@@ -1,10 +1,12 @@
+require './config_reader'
+
 # General
-SiteName = "Lamer News"
-SiteUrl = "http://lamernews.com"
+SiteName = "Techbubbler"
+SiteUrl = "http://techbubbler.com"
 
 # Redis config
-RedisHost = "127.0.0.1"
-RedisPort = 10000
+RedisHost = RedisConfig.host
+RedisPort = RedisConfig.port
 
 # Security
 PBKDF2Iterations = 1000 # Set this to 5000 to improve security. But it is slow.
@@ -30,7 +32,7 @@ NewsUpvoteKarmaTransfered = 1
 KarmaIncrementComment = 1
 
 # UI Elements
-KeyboardNavigation = 1
+KeyboardNavigation = 0
 
 # User
 DeletedUser = {"username" => "deleted_user", "email" => "", "id" => -1}
@@ -48,8 +50,15 @@ NewsSubmissionBreak = 60*15
 SavedNewsPerPage = 10
 
 # Footer links
-FooterTwitterLink = false
+FooterTwitterLink = "TechBubbler"
 FooterGoogleGroupLink = false
 
 # API
 APIMaxNewsCount = 32
+
+# Revision
+Revision = if File.exists?("REVISION")
+  File.open("REVISION").read.strip
+else
+  `git rev-parse HEAD`.strip
+end

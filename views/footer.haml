@@ -1,0 +1,38 @@
+.container
+  .show-on-phones
+    - unless defined? @on_submit
+      .row
+        %dl.nice.tabs.mobile
+          %dd
+            %a{:href => "/submit"} Submit Story
+    - if $user
+      .row.user-tab
+        %dl.nice.tabs.mobile
+          %dd
+            %a{:href => "/user/#{H.urlencode($user['username'])}"}
+              %img.avatar{:src => gravatar_url_for($user['email'],32)}
+              %span.user== #{$user['username']} (#{$user['karma']})
+      .row
+        %dl.nice.tabs.mobile
+          %dd
+            %a{:href => "/logout?apisecret=#{$user['apisecret']}"} Logout
+    - else
+      - unless defined? @on_signup
+        .row
+          %dl.nice.tabs.mobile
+            %dd
+              %a{:href => "/signup"} Signup
+      - unless defined? @on_login
+        .row
+          %dl.nice.tabs.mobile
+            %dd
+              %a{:href => "/login"} Login
+
+  .footer-links
+    %a{:href => "/"}== #{SiteName} &copy #{Time.now.year}
+    %span= "|"
+    %a{:href => "http://github.com/foysavas/techbubbler"} Source Code
+    %span= "|"
+    %a{:href => "/rss"} RSS
+    %span= "|"
+    %a{:href => "http://twitter.com/#{FooterTwitterLink}"} Twitter

@@ -1,0 +1,16 @@
+%h2 Signup
+#signup
+  %form.nice{:name=>"f"}
+    %label{:for => "username"} Username
+    %input#username.input-text{:type => "text", :name => "username"}
+    %label{:for => "password"} Password
+    %input.input-text{:type => :password, :id => "password", :name => "password"}
+    %input{:type => :hidden, :name => "register", :value => "1"}
+    %button.nice.medium.radius.white.button{:name => "do_login"} Create Account
+    #errormsg
+
+
+:javascript
+  $(function() {
+      $("form[name=f]").submit(login);
+  });

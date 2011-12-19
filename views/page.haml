@@ -1,0 +1,21 @@
+!!! html5
+%html
+  %head
+    %meta{:charset => "utf-8"}
+    %title= @title || SiteName
+    %link{:href => "/stylesheets/compiled/screen.css?v=#{Revision}", :rel => "stylesheet", :type => "text/css"}
+    %link{:href => "/images/favicon.png", :rel => "shortcut icon"}
+    %script{:src => "//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"}
+    %script{:src => "/javascripts/foundation.js"}
+    %script{:src => "/javascripts/app.js?v=#{Revision}"}
+  %body{:class => ($user ? 'with-user' : 'sans-user')}
+    #fixed-header
+      - if !$user
+        #site-description
+          %h1 Community Driven News for Tech Entrepreneurs<span class="missing-on-phones"> &amp; Enthusiasts</span>
+      %header= haml :header
+    #not-header
+      #content
+        .container= yield
+      %footer= haml :footer
+    = haml :foot
