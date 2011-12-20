@@ -17,7 +17,10 @@ body {
 
 #site-name {
 	display: inline-block;
-	@include replace-text-with-dimensions("/images/header-techbubbler.png");
+	@include replace-text-with-dimensions("/images/header-techbubbler-2x.png");
+	background-size: contain;
+	width: 129px;
+	height: 16px;
 	padding: 11px 0px;
 	vertical-align: top;
 }
