@@ -57,8 +57,15 @@ get "/stylesheets/compiled/:fn.css" do
   if !File.exists? "views/stylesheets/#{params[:fn]}.scss"
     halt(404,"404 - Not found.")
   end
+  r = scss :"stylesheets/#{params[:fn]}"
+  if settings.environment == :production
+    FileUtils.mkdir_p "public/stylesheets/compiled"
+    File.open("public/stylesheets/compiled/#{params[:fn]}.css", "w") do |f|
+      f.write r
+    end
+  end
   content_type 'text/css', :charset => 'utf-8'
-  scss :"stylesheets/#{params[:fn]}"
+  r
 end
 
 
