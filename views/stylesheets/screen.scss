@@ -284,6 +284,10 @@ article {
 		&:hover {
 			@include replace-text-with-dimensions("/images/uparrow-dark.png");
 		}
+		&.voted {
+			@include replace-text-with-dimensions("/images/uparrow-dark.png");
+			opacity: 0.8;
+		}
 	}
 	.article-rank .downarrow {
 		display: inline-block;

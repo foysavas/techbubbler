@@ -9,6 +9,16 @@
     %script{:src => "//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"}
     %script{:src => "/javascripts/foundation.js"}
     %script{:src => "/javascripts/app.js?v=#{Revision}"}
+    - if $user
+      %meta{:name => "username", :value => $user['username']}
+    -#%script{:src => "http://platform.twitter.com/anywhere.js?id=#{$twitter_options[:consumer_key]}&v=1", :type => "text/javascript"}
+    :javascript
+      /*
+      twttr.anywhere(function (T) {
+        //T.linkifyUsers({ className: 'username' });
+        T.hovercards({ className: 'username' });
+      });
+      */
   %body{:class => ($user ? 'with-user' : 'sans-user')}
     #fixed-header
       - if !$user

@@ -15,12 +15,12 @@
 
   %article{"data-news-id" => news["id"]}
     .article-rank{:class => "#{defined?(num) ? '' : 'no-number'}"}
-      %a.uparrow{:href => "#up", :cass => upclass} &#9650;
+      %a.uparrow{:href => "#up", :class => upclass} &#9650;
       - if defined? num
         %span.number= num
       - else
         %span.number
-      %a.downarrow{:href => "#down", :cass => downclass} &#9660;
+      %a.downarrow{:href => "#down", :class => downclass} &#9660;
     .article-link-and-info
       %h2.article-link
         %a{:href=>news["url"]}= H.entities news["title"]
@@ -31,7 +31,7 @@
               = H.entities(domain)
               %span.sep= "|"
           %span.posted-by-label== posted by
-          %a.posted-by-user{:href=>"/user/"+H.urlencode(news["username"])}= H.entities news["username"]
+          %a.posted-by-user.username{:href=>"/user/"+H.urlencode(news["username"])}== @#{news["username"]}
           = str_elapsed(news["ctime"].to_i)
           %span.sep= "|"
         %a.comment-count{:href => "/news/#{news["id"]}"}= news["comments"]+" comments"

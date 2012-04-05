@@ -1,0 +1,6 @@
+$twitter_options = {
+  :consumer_key => 'REPLACE',
+  :consumer_secret => 'REPLACE',
+  :oauth_token => 'REPLACE',
+  :oauth_token_secret => 'REPLACE'
+}

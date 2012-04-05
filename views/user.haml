@@ -1,8 +1,8 @@
 .user
   .avatar
-    %img.profile-image{:src=>gravatar_url_for(@user['email'],128)}
-  %h2= H.entities(@user['username'])
-  .about= H.entities(@user['about'])
+    %img.profile-image{:src => @user['image'].gsub('_normal.','_bigger.')}
+  %h2= H.entities('@'+@user['username'])
+  -#.about= H.entities(@user['about'])
   %ul.stats
     %li
       %b== created #{(Time.now.to_i-@user['ctime'].to_i)/(3600*24)} days ago
@@ -20,13 +20,11 @@
 
 - if @owner
   %form.nice{:name=>"f"}
-    %h2 Edit Profile
-    %label{:for => "email"} Email (not public, only used to set user icon with <a href="http://gravatar.com">Gravatar</a>)
-    %input#email.input-text.large{:type => :text, :name => "email", :size => 40, :value => H.entities(@user['email'])}
-    %label{:for => "password"} Change Password (optional)
-    %input.input-text.large{:type => :password, :name => "password", :size => 40}
-    %label{:for => "about"} About
-    %textarea#about.large{ :name => "about", :cols => 60, :rows => 10}= H.entities @user['about']
+    %h2 Settings
+    %input#retweet-up-votes{:name => "retweet_upvotes", :type => :checkbox, :value => "1", :checked => (@user['retweet_upvotes'] ? true : false)}
+      %label{:for => 'retweet-up-votes'} Retweet up-votes
+    %input#mention-me-on-posts{:name => "mention_in_tweets", :type => :checkbox, :value => "1", :checked => (@user['mention_in_tweets'] ? true : false)}
+      %label{:for => 'mention-me-on-posts'} Mention me on post tweets
     %button.nice.medium.radius.white.button{:name => "update_profile"} Update
     #errormsg
   :javascript

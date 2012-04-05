@@ -50,7 +50,7 @@ NewsSubmissionBreak = 60*15
 SavedNewsPerPage = 10
 
 # Footer links
-FooterTwitterLink = "TechBubbler"
+FooterTwitterLink = "techbubbler"
 FooterGoogleGroupLink = false
 
 # API

@@ -10,6 +10,9 @@ gem 'rake'
 gem 'haml'
 gem 'sass'
 gem 'compass'
+gem 'twitter'
+gem 'omniauth'
+gem 'omniauth-twitter'
 
 group :production do
   gem 'unicorn'

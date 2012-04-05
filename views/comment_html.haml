@@ -11,7 +11,7 @@
     %article{:class => "comment", :style => indent, "data-comment-id" => comment_id, :id => comment_id}
       .info-and-avatar
         %span.avatar
-          %img{:src => gravatar_url_for(u['email'],22)}
+          %img{:src => u['image'], :width => 22, :height => 22}
         %span.info
           %span.username
             %a{:href=>"/user/"+H.urlencode(u["username"])}= H.entities u["username"]

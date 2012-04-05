@@ -33,11 +33,35 @@ require 'digest/sha1'
 require 'digest/md5'
 
 require './app_config'
+require './config/twitter'
 require './page'
 require './comments'
 require './pbkdf2'
 
 require 'openssl' if UseOpenSSL
+
+use Rack::Session::Cookie
+use OmniAuth::Builder do
+  provider :twitter, $twitter_options[:consumer_key], $twitter_options[:consumer_secret]
+end
+
+Twitter.configure do |config|
+  config.consumer_key = $twitter_options[:consumer_key]
+  config.consumer_secret = $twitter_options[:consumer_secret]
+end
+
+%w(get post).each do |method|
+  send(method, "/auth/twitter/callback") do
+    auth_token,err = find_or_create_twitter_user(request.env['omniauth.auth'])
+    if auth_token
+      session['auth'] = auth_token
+      redirect '/'
+    else
+      redirect '/'
+    end
+  end
+end
+
 
 configure :development do
   use Rack::Reloader
@@ -71,28 +95,37 @@ end
 
 
 before do
-    $r = Redis.new(:host => RedisHost, :port => RedisPort) if !$r
-    H = HTMLGen.new if !defined?(H)
-    if !defined?(Comments)
-        Comments = RedisComments.new($r,"comment",proc{|c,level|
-            c.sort {|a,b|
-                ascore = compute_comment_score a
-                bscore = compute_comment_score b
-                if ascore == bscore
-                    # If score is the same favor newer comments
-                    b['ctime'].to_i <=> a['ctime'].to_i
-                else
-                    # If score is different order by score.
-                    # FIXME: do something smarter favouring newest comments
-                    # but only in the short time.
-                    bscore <=> ascore
-                end
-            }
-        })
-    end
-    $user = nil
-    auth_user(request.cookies['auth'])
-    increment_karma_if_needed if $user
+  $r = Redis.new(:host => RedisHost, :port => RedisPort) if !$r
+  H = HTMLGen.new if !defined?(H)
+  if !defined?(Comments)
+    Comments = RedisComments.new($r,"comment",proc{|c,level|
+      c.sort {|a,b|
+        ascore = compute_comment_score a
+        bscore = compute_comment_score b
+        if ascore == bscore
+          # If score is the same favor newer comments
+          b['ctime'].to_i <=> a['ctime'].to_i
+        else
+          # If score is different order by score.
+          # FIXME: do something smarter favouring newest comments
+          # but only in the short time.
+          bscore <=> ascore
+        end
+      }
+    })
+  end
+  $user = nil
+  $user = find_session_user(session['auth'])
+  if $user
+    increment_karma_if_needed
+    $user_twitter_client = Twitter::Client.new(
+      :oauth_token => $user['twitter_access_token'],
+      :oauth_token_secret => $user['twitter_access_secret']
+    )
+  else
+    session['auth'] = nil
+    $user_twitter_client = nil # Twitter::Client.new
+  end
 end
 
 require './views'

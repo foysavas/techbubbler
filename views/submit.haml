@@ -5,7 +5,7 @@
     %h2.form-step
       %span.number 1
       %span.text What's the headline?
-    %label{:for => "title"} Title
+    %label{:for => "title", :style => "display: none;"} Title
     %input#title.input-text.large{:type => :text, :name => "title", :size => 80, :value => (params[:t] ? H.entities(params[:t]) : "")}
     %h2.form-step
       %span.number 2

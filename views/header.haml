@@ -9,12 +9,13 @@
     %a{:href => "/submit"} Submit
     - if $user
       %a{:href => "/user/#{H.urlencode($user['username'])}"}
-        %img.avatar{:src => gravatar_url_for($user['email'],32)}
-        %span.user== #{$user['username']} (#{$user['karma']})
+        %img.avatar{:src => $user['image'], :height => 32, :width => 32}
+        %span.user
+          %span.username== @#{$user['username']}
+          %span (#{$user['karma']})
       %a{:href => "/logout?apisecret=#{$user['apisecret']}"} logout
     - else
-      %a{:href => "/signup"} Signup
-      %a{:href => "/login"} Login
+      %a{:href => "/auth/twitter"} Sign in with Twitter
   #header-floats.hide-on-phones
     #header-float-left
     #header-float-right

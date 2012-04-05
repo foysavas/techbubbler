@@ -5,61 +5,12 @@
 post '/api/logout' do
     content_type 'application/json'
     if $user and check_api_secret
-        update_auth_token($user["id"])
+        update_auth_token($user['id'])
         return {:status => "ok"}.to_json
     else
         return {
             :status => "err",
             :error => "Wrong auth credentials or API secret."
-        }.to_json
-    end
-end
-
-get '/api/login' do
-    content_type 'application/json'
-    if (!check_params "username","password")
-        return {
-            :status => "err",
-            :error => "Username and password are two required fields."
-        }.to_json
-    end
-    auth,apisecret = check_user_credentials(params[:username],
-                                            params[:password])
-    if auth 
-        return {
-            :status => "ok",
-            :auth => auth,
-            :apisecret => apisecret
-        }.to_json
-    else
-        return {
-            :status => "err",
-            :error => "Username and password do not match."
-        }.to_json
-    end
-end
-
-post '/api/create_account' do
-    content_type 'application/json'
-    if (!check_params "username","password")
-        return {
-            :status => "err",
-            :error => "Username and password are two required fields."
-        }.to_json
-    end
-    if params[:password].length < PasswordMinLength
-        return {
-            :status => "err",
-            :error => "Password is too short. Min length: #{PasswordMinLength}"
-        }.to_json
-    end
-    auth,errmsg = create_user(params[:username],params[:password])
-    if auth 
-        return {:status => "ok", :auth => auth}.to_json
-    else
-        return {
-            :status => "err",
-            :error => errmsg
         }.to_json
     end
 end
@@ -101,6 +52,8 @@ post '/api/submit' do
         end
         news_id = insert_news(params[:title],params[:url],params[:text],
                               $user["id"])
+        tweet_inserted_news(news_id)
+        news_id
     else
         news_id = edit_news(params[:news_id],params[:title],params[:url],
                             params[:text],$user["id"])
@@ -197,23 +150,18 @@ post '/api/updateprofile' do
     if not check_api_secret
         return {:status => "err", :error => "Wrong form secret."}.to_json
     end
-    if !check_params(:about, :email, :password)
-        return {:status => "err", :error => "Missing parameters."}.to_json
+    puts params.inspect
+    uk = "user:#{$user['id']}"
+    if params[:retweet_upvotes] == "0"
+      $r.hdel(uk,'retweet_upvotes')
+    else
+      $r.hset(uk,'retweet_upvotes',true)
     end
-    if params[:password].length > 0
-        if params[:password].length < PasswordMinLength
-            return {
-                :status => "err",
-                :error => "Password is too short. "+
-                          "Min length: #{PasswordMinLength}"
-            }.to_json
-        end
-        $r.hmset("user:#{$user['id']}","password",
-            hash_password(params[:password],$user['salt']))
+    if params[:mention_in_tweets] == "0"
+      $r.hdel(uk,'mention_in_tweets')
+    else
+      $r.hset(uk,'mention_in_tweets',true)
     end
-    $r.hmset("user:#{$user['id']}",
-        "about", params[:about][0..4095],
-        "email", params[:email][0..255])
     return {:status => "ok"}.to_json
 end
 
@@ -314,13 +262,3 @@ def check_api_secret
     return false if !$user
     params["apisecret"] and (params["apisecret"] == $user["apisecret"])
 end
-
-# Generic API limiting function
-def rate_limit_by_ip(delay,*tags)
-    key = "limit:"+tags.join(".")
-    return true if $r.exists(key)
-    $r.setex(key,delay,1)
-    return false
-end
-
-

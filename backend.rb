@@ -2,6 +2,126 @@
 # User and authentication
 ################################################################################
 
+$r = Redis.new(:host => RedisHost, :port => RedisPort) if !$r
+
+class TbTwitterClient < Twitter::Client
+  def initialize(opts={})
+    super($twitter_options.merge(opts))
+  end
+end
+
+class UserTwitterClient < Twitter::Client
+  def initialize(user_id)
+    oauth_token = $r.hget("user:#{user_id}",'oauth_token')
+    oauth_secret = $r.hget("user:#{user_id}",'oauth_secret')
+    super($twitter_options.merge(:oauth_token => oauth_token, :oauth_token_secret => oauth_secret))
+  end
+end
+
+def news_to_tweet(news_id)
+  i = get_news_by_id(news_id)
+  username = i['username']
+  link = "#{SiteUrl}/news/#{news_id}"
+  title = i['title']
+  text = ""
+  remaining = 140
+  if $r.hget("user:#{i['user_id']}","mention_in_tweets")
+    text = " (@#{username}) #{link}"
+    remaining = remaining - 25 - username.length
+  else
+    text = " #{link}"
+    remaining = remaining - 21
+  end
+  if title.length <= remaining
+    text = "#{title}#{text}"
+  else
+    text = "#{title[0,remaining-3]}...#{text}"
+  end
+  text
+end
+
+def tweet_inserted_news(news_id)
+  i = get_news_by_id(news_id)
+  if $r.hget("user:#{i['user_id']}","tweet_posts")
+    tweet_text = news_to_tweet(news_id)
+    begin
+      tb_client = TbTwitterClient.new
+      tweet = tb_client.update(tweet_text)
+      $r.hset("news:#{news_id}","tweet_id",tweet.id)
+      begin
+        UserTwitterClient.new(i['user_id']).retweet(tweet.id)
+      rescue
+      end
+    rescue
+    end
+  end
+end
+
+def retweet_news_item(news_id,user_id)
+  if $r.hget("user:#{user_id}","retweet_upvotes")
+    if tweet_id = $r.hget("news:#{news_id}","tweet_id")
+      UserTwitterClient.new(user_id).retweet(tweet_id)
+    end
+  end
+end
+
+def update_twitter_user(id,auth)
+  $r.hmset("user:#{id}",
+    "id",id,
+    "username", auth['info']['nickname'],
+    "image",auth['info']['image'],
+    "bio",auth['info']['description'],
+    "oauth_token",auth['credentials']['token'],
+    "oauth_secret",auth['credentials']['secret']
+  )
+  $r.set("username.to.id:#{auth['info']['nickname'].downcase}",id)
+end
+
+def find_or_create_twitter_user(auth)
+  id = auth['uid']
+  username = auth['info']['nickname']
+  user = $r.hgetall("user:#{id}")
+  if user['id']
+    if user['auth'].nil? || !$r.exists("auth:#{user['auth']}")
+      update_auth_token(user["id"])
+    end
+    update_twitter_user(id,auth)
+    return user['auth'], nil
+  else
+    if $r.exists("username.to.id:#{username.downcase}")
+      return nil, "Username is busy, please try a different one."
+    end
+    if rate_limit_by_ip(3600*15,"create_user",request.ip)
+      return nil, "Please wait some time before creating a new user."
+    end
+    seq_id = $r.incr("users.count")
+    auth_token = get_rand
+    $r.hmset("user:#{id}",
+      "tweet_posts",true,
+      "retweet_upvotes",true,
+      "mention_in_tweet",true,
+      "seq_id",seq_id,
+      "ctime",Time.now.to_i,
+      "karma",UserInitialKarma,
+      "auth",auth_token,
+      "apisecret",get_rand,
+      "flags","",
+      "karma_incr_time",Time.new.to_i
+    )
+    $r.set("auth:#{auth_token}",id)
+    update_twitter_user(id,auth)
+    return auth_token,nil
+  end
+end
+
+def find_session_user(auth)
+  return if !auth
+  id = $r.get("auth:#{auth}")
+  return if !id
+  user = $r.hgetall("user:#{id}")
+  $user = user if user.length > 0
+end
+
 # Try to authenticate the user, if the credentials are ok we populate the
 # $user global with the user information.
 # Otherwise $user is set to nil, so you can test for authenticated user
@@ -100,13 +220,16 @@ end
 # Return value: on success the new token is returned. Otherwise nil.
 # Side effect: the auth token is modified.
 def update_auth_token(user_id)
-    user = get_user_by_id(user_id)
-    return nil if !user
-    $r.del("auth:#{user['auth']}")
-    new_auth_token = get_rand
-    $r.hmset("user:#{user_id}","auth",new_auth_token)
-    $r.set("auth:#{new_auth_token}",user_id)
-    return new_auth_token
+  puts "UPDATING AUTH TOKEN user_id:#{user_id}"
+  user = get_user_by_id(user_id)
+  return nil if !user
+  puts "DELETING auth:#{user['auth']}"
+  puts user.inspect
+  $r.del("auth:#{user['auth']}")
+  new_auth_token = get_rand
+  $r.hmset("user:#{user_id}","auth",new_auth_token)
+  $r.set("auth:#{new_auth_token}",user_id)
+  return new_auth_token
 end
 
 # Turn the password into an hashed one, using PBKDF2 with HMAC-SHA1
@@ -289,7 +412,12 @@ def vote_news(news_id,user_id,vote_type)
     if $r.zscore("news.up:#{news_id}",user_id) or
        $r.zscore("news.down:#{news_id}",user_id)
        return false,"Duplicated vote."
+    else
+      if vote_type == :up
+        retweet_news_item(news_id,user_id)
+      end
     end
+
 
     # Check if the user has enough karma to perform this operation
     if $user['id'] != news['user_id']
@@ -636,3 +764,12 @@ def get_user_comments(user_id,start,count)
     [comments,numitems]
 end
 
+# Generic API limiting function
+def rate_limit_by_ip(delay,*tags)
+  if $r.get('settings.rate_limits')
+    key = "limit:"+tags.join(".")
+    return true if $r.exists(key)
+    $r.setex(key,delay,1)
+  end
+  return false
+end

@@ -82,14 +82,15 @@ end
 
 get '/submit' do
   @on_submit = true
-    redirect "/login" if !$user
+    redirect "/auth/twitter" if !$user
     @title = "Submit a new story - #{SiteName}"
     haml :submit, :layout => :page
 end
 
 get '/logout' do
     if $user and check_api_secret
-        update_auth_token($user["id"])
+      puts 'user: ', $user.inspect
+      update_auth_token($user["id"])
     end
     redirect "/"
 end

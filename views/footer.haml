@@ -10,24 +10,17 @@
         %dl.nice.tabs.mobile
           %dd
             %a{:href => "/user/#{H.urlencode($user['username'])}"}
-              %img.avatar{:src => gravatar_url_for($user['email'],32)}
+              %img.avatar{:src => $user['image'], :height => 32, :width => 32}
               %span.user== #{$user['username']} (#{$user['karma']})
       .row
         %dl.nice.tabs.mobile
           %dd
             %a{:href => "/logout?apisecret=#{$user['apisecret']}"} Logout
     - else
-      - unless defined? @on_signup
-        .row
-          %dl.nice.tabs.mobile
-            %dd
-              %a{:href => "/signup"} Signup
-      - unless defined? @on_login
-        .row
-          %dl.nice.tabs.mobile
-            %dd
-              %a{:href => "/login"} Login
-
+      .row
+        %dl.nice.tabs.mobile
+          %dd
+            %a{:href => "/auth/twitter"} Sign in with Twitter
   .footer-links
     %a{:href => "/"}== #{SiteName} &copy #{Time.now.year}
     %span= "|"

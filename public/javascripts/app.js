@@ -52,9 +52,8 @@ function submit() {
 
 function update_profile() {
     var data = {
-        email: $("input[name=email]").val(),
-        password: $("input[name=password]").val(),
-        about: $("textarea[name=about]").val(),
+				retweet_upvotes: $("input[name=retweet_upvotes]").is(':checked') ? 1 : 0,
+        mention_in_tweets: $("input[name=mention_in_tweets]").is(':checked') ? 1 : 0,
         apisecret: apisecret
     };
     $.ajax({
@@ -267,3 +266,14 @@ $(function() {
         }
     });
 });
+
+$(function(){
+	function send_to_twitter_auth() {
+		window.location.href = '/auth/twitter';
+	}
+	if ($('meta[name=username]').length == 0) {
+		$('a.uparrow').click(send_to_twitter_auth);
+		$('a.downarrow').click(send_to_twitter_auth);
+	}
+});
+
