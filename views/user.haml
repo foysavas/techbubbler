@@ -21,10 +21,12 @@
 - if @owner
   %form.nice{:name=>"f"}
     %h2 Settings
-    %input#retweet-up-votes{:name => "retweet_upvotes", :type => :checkbox, :value => "1", :checked => (@user['retweet_upvotes'] ? true : false)}
-      %label{:for => 'retweet-up-votes'} Retweet up-votes
-    %input#mention-me-on-posts{:name => "mention_in_tweets", :type => :checkbox, :value => "1", :checked => (@user['mention_in_tweets'] ? true : false)}
-      %label{:for => 'mention-me-on-posts'} Mention me on post tweets
+    .checkbox
+      %input#retweet-up-votes{:name => "retweet_upvotes", :type => :checkbox, :value => "1", :checked => (@user['retweet_upvotes'] ? true : false)}
+        %label{:for => 'retweet-up-votes'} Retweet story up-votes
+    .checkbox
+      %input#mention-me-on-posts{:name => "mention_in_tweets", :type => :checkbox, :value => "1", :checked => (@user['mention_in_tweets'] ? true : false)}
+        %label{:for => 'mention-me-on-posts'} Mention me on story tweets
     %button.nice.medium.radius.white.button{:name => "update_profile"} Update
     #errormsg
   :javascript

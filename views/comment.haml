@@ -1,7 +1,8 @@
 %section#newslist= haml :news_item, :locals => {:news => @news}
 .singlecomment
   - u = get_user_by_id(@comment["user_id"]) || DeletedUser
-  = haml :comment_html, :locals => {:c => @comment,:u => u}
-  %h2 Replies
+  .originalcomment
+    = haml :comment_html, :locals => {:c => @comment,:u => u}
+  %h2.replies Replies
   .commentreplies
     = render_comments_for_news(@comment['thread_id'],@comment["id"].to_i)

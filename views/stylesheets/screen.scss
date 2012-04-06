@@ -10,7 +10,8 @@
 @import "foundation";
 
 body {
-	font-family: "Helvetica Neue", "Arial";
+	font-family: HelveticaNeue, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 14px;
 	text-rendering: optimizeLegibility;
 	background: #ebebeb;
 }
@@ -37,12 +38,22 @@ h2 {
     color:#333;
 }
 
+textarea.large {
+	height: 8em;
+}
+
 @media only screen and (max-width: 481px) {
 body {
 	background: white;
 }
 .missing-on-phones {
 	display: none;
+}
+}
+
+@media only screen and (max-width: 767px) {
+textarea.large {
+	height: 5em;
 }
 }
 
@@ -268,14 +279,18 @@ article {
 	.article-rank {
 		width: 65px;
 		&.no-number {
-			width: 50px;
+			.number {
+				height: 1em;
+			}
 		}
 	}
 	.article-rank .number {
 		width: 2em;
 		color: #dbdbdb;
 		font-size: 12px;
-		margin: 0px 7px;
+		margin: 0px;
+		text-align: center;
+		display: inline-block;
 		overflow: hidden;
 	}
 	.article-rank .uparrow {
@@ -303,12 +318,14 @@ article {
 			color: #333;
 			margin: 0;
 			padding: 0;
-			font-size: 12px;
+			font-size: 14px;
+			line-height: 17px;
 			font-weight: bold;
 		}
 		.info, .info a {
 			color: #a6a6a6;
-			font-size: 11px;
+			font-size: 12px;
+			line-height: 24px;
 			margin: 0;
 			padding: 0;
 		}
@@ -371,9 +388,9 @@ form textarea {
 
 .comment {
     position:relative;
-    width:500px;
+    wdth:500px;
     display:block;
-    margin-bottom:40px;
+    margin-bottom:20px;
     min-height:50px;
 }
 
@@ -391,6 +408,9 @@ form textarea {
     font-size:14px;
     color:#999;
 }
+.comment .perma-mobile {
+	display: none;
+}
 
 .comment .info a.reply {
     text-decoration:underline;
@@ -398,15 +418,103 @@ form textarea {
 }
 
 .comment pre, .comment .comment-text {
-    width:50em;
+    max-width: 36em;
     position:relative;
-    left:60px;
+    lft:60px;
     top:10px;
-    white-space: pre-wrap;       /* css-3 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
+    hite-space: pre-wrap;       /* css-3 */
+    hite-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    hite-space: -pre-wrap;      /* Opera 4-6 */
+    hite-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
+		p {
+			margin: 10px 0;
+		}
+}
+
+article.comment {
+	.info-and-avatar {
+		a {
+			font-weight: normal;
+			text-decoration: none !important;
+		}
+		a.username {
+			font-weight: bold;
+		}
+		.reply-or-vote {
+			margin-left: 10px;
+			display: inline-block;
+		}
+	}
+}
+
+@media only screen and (max-width: 767px) {
+.comment-html {
+	.avatar img {
+		width: 30px !important;
+		height: 30px !important;
+		margin-top: 8px;
+	}
+}
+.comment {
+	idth: 100%;
+	margin-left: 0 !important;
+}
+.comment pre, .comment .comment-text {
+	margin-left: 0 !important;
+	max-width: 92%;
+	width: 92%;
+	left: 0;
+	top: 0;
+}
+.comment-html .info-and-avatar .info {
+	left: 40px !important;
+	.reply-or-vote {
+		float: right;
+	}
+	.reply, .uparrow, .downarrow {
+		margin-left: 5px;
+	}
+	.perma {
+		display: none !important;
+	}
+}
+.perma-mobile {
+	@include clearfix;
+	display: block !important;
+	font-size: 13px;
+	.ctime {
+		float: right;
+	}
+	.in-reply {
+		float: left;
+		margin-left: 40px;
+	}
+}
+article.comment {
+	margin-bottom: 0px;
+	border-top: 1px solid #dbdbdb;
+	.info-and-avatar {
+		margin-top: 10px;
+		position: relative;
+	}
+
+}
+
+.singlecomment {
+	padding-top: 0px !important;
+	h2.replies {
+		padding-top: 15px;
+	}
+	.originalcomment {
+		article.comment {
+			border: none !important;
+		}
+	}
+	.commentreplies {
+		margin-left: 0 !important;
+	}
+}
 }
 
 article.comment .uparrow, article.comment .downarrow {
@@ -430,7 +538,7 @@ topcomment {
 }
 
 .singlecomment {
-    background-color: #eee;
+    background-color: #fcfcfc;
     border: 1px dotted #ccc;
     padding: 15px;
     margin:10px;
@@ -652,6 +760,17 @@ form.nice {
 		}
 	}
 	.comment-text {
-		font-size: 11px;
+		font-size: 14px;
+		p {
+			line-height: 1.5em;
+		}
 	}
+}
+
+form.nice {
+.checkbox {
+	input, label {
+		display: inline-block;
+	}
+}
 }

@@ -773,3 +773,11 @@ def rate_limit_by_ip(delay,*tags)
   end
   return false
 end
+
+def comment_username(article_id,comment_id)
+  begin
+    $r.hget("user:"+JSON.parse($r.hget("thread:comment:#{article_id}",comment_id))['user_id'],'username')
+  rescue
+    nil
+  end
+end

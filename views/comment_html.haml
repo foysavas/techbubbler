@@ -13,18 +13,28 @@
         %span.avatar
           %img{:src => u['image'], :width => 22, :height => 22}
         %span.info
-          %span.username
-            %a{:href=>"/user/"+H.urlencode(u["username"])}= H.entities u["username"]
+          %span
+            %a.username{:href=>"/user/"+H.urlencode(u["username"])}== @#{u["username"]}
             - if !c['topcomment']
-              %a{:href=>"/comment/#{news_id}/#{c["id"]}", :class=>"reply"}
+              %a{:href=>"/comment/#{news_id}/#{c["id"]}", :class=>"perma"}
                 %span.ctime= str_elapsed(c["ctime"].to_i)+". "
             - else
               %span.ctime= str_elapsed(c["ctime"].to_i)+". "
-            - if $user and !c['topcomment']
-              %a{:href=>"/reply/#{news_id}/#{c["id"]}", :class=>"reply"} reply
-            - if !c['topcomment']
-              %a.uparrow{:href => "#up"} &#9650;
-              %a.downarrow{:href => "#down"} &#9660;
-            - if show_edit_link
-              %a{:href=> "/editcomment/#{news_id}/#{c["id"]}", :class =>"reply"}== edit (#{(CommentEditTime - (Time.now.to_i-c['ctime'].to_i))/60} minutes left)
-      .comment-text= urls_to_links H.entities(c["body"].strip)
+            .reply-or-vote
+              - if !c['topcomment']
+                %a.uparrow{:href => "#up"} &#9650;
+                %a.downarrow{:href => "#down"} &#9660;
+              - if show_edit_link
+                %a{:href=> "/editcomment/#{news_id}/#{c["id"]}", :class =>"reply"}== edit (#{(CommentEditTime - (Time.now.to_i-c['ctime'].to_i))/60} minutes left)
+              - if $user and !c['topcomment']
+                %a{:href=>"/reply/#{news_id}/#{c["id"]}", :class=>"reply"} reply
+
+      - if !c['topcomment']
+        .perma-mobile
+          %a.ctime{:href=>"/comment/#{news_id}/#{c["id"]}"}= str_elapsed(c["ctime"].to_i)
+          - if c['parent_id'] > 0
+            - if parent_username = comment_username(news_id,c['parent_id'])
+              %a.in-reply{:href => "/comment/#{news_id}/#{c['parent_id']}" }== in reply to @#{parent_username}
+            - else
+              %a.in-reply{:href => "/comment/#{news_id}/#{c['parent_id']}" }== in reply to comment
+      .comment-text= "<p>" + urls_to_links(H.entities(c["body"].strip)).split("\n").map{|i| i.strip.empty? ? nil : i}.compact.join("</p><p>") + "</p>"
