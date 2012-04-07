@@ -22,16 +22,25 @@ def news_to_tweet(news_id)
   i = get_news_by_id(news_id)
   username = i['username']
   link = "#{SiteUrl}/news/#{news_id}"
+  view_link = "#{SiteUrl}/view/#{news_id}"
+  discuss_link = "#{SiteUrl}/discuss/#{news_id}"
   title = i['title']
   text = ""
   remaining = 140
-  if $r.hget("user:#{i['user_id']}","mention_in_tweets")
-    text = " (@#{username}) #{link}"
-    remaining = remaining - 25 - username.length
-  else
+
+  if i['url'].match(/^text:\/\//)
     text = " #{link}"
     remaining = remaining - 21
+  else
+    text = " #{discuss_link} #{view_link}"
+    remaining = remaining - 42
   end
+
+  if $r.hget("user:#{i['user_id']}","mention_in_tweets")
+    text = " (@#{username})#{text}"
+    remaining = remaining - 4 - username.length
+  end
+
   if title.length <= remaining
     text = "#{title}#{text}"
   else

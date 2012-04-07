@@ -128,6 +128,22 @@ before do
   end
 end
 
+get '/view/:id' do
+  url = $r.hget("news:#{params[:id]}",'url')
+  if url.match(/^text:\/\//)
+    redirect "/news/#{id}"
+  elsif url.length > 1
+    redirect url
+  else
+    redirect '/'
+  end
+end
+
+get '/discuss/:id' do
+  redirect "/news/#{params[:id]}"
+end
+
+
 require './views'
 require './api'
 require './backend'
