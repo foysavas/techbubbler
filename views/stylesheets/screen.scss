@@ -774,3 +774,41 @@ form.nice {
 	}
 }
 }
+
+section#newslist {
+	display: table;
+	width: 100%;
+	article {
+		display: table-row;
+		.article-rank {
+			display: table-cell;
+			padding-bottom: 15px;
+		}
+		.article-link-and-info {
+			padding-left: 20px;
+			display: table-cell;
+			padding-bottom: 15px;
+		}
+	}
+}
+
+@media only screen and (max-width: 481px) {
+section#newslist {
+	article {
+		.article-rank {
+			border-top: 1px solid #dbdbdb;
+			padding-left: 10px;
+			padding-top: 8px;
+			padding-bottom: 8px;
+		}
+		.article-link-and-info {
+			border-top: 1px solid #dbdbdb;
+			padding-left: 10px;
+			padding-top: 8px;
+			padding-bottom: 8px;
+		}
+	}
+}
+
+
+}
